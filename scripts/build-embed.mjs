@@ -144,4 +144,71 @@ copyFileSync(
   join(root, 'node_modules', 'flubber', 'build', 'flubber.min.js'),
   join(root, 'dist', 'flubber.min.js')
 );
-console.log('Built dist/logo-animato.js + dist/flubber.min.js');
+
+const bundle = [
+  readFileSync(join(root, 'node_modules', 'flubber', 'build', 'flubber.min.js'), 'utf8'),
+  js,
+].join('\n');
+writeFileSync(join(root, 'dist', 'ml-logo.bundle.js'), bundle);
+
+const elementorHtml = `<style>
+.ml-logo-anim{display:block;width:100%;max-width:450px;margin:0 auto;line-height:0}
+.ml-logo-anim svg{display:block;width:100%;height:auto}
+.ml-logo-anim path{fill:#1a1a1a!important}
+</style>
+<div class="ml-logo-anim" id="ml-logo-anim" aria-hidden="true"></div>
+<script>
+(function (w, d, base) {
+  var el = d.getElementById('ml-logo-anim');
+  if (!el || el.dataset.mlLogoQueued) return;
+  el.dataset.mlLogoQueued = '1';
+
+  function loadBundle() {
+    if (d.getElementById('ml-logo-bundle')) return;
+    var s = d.createElement('script');
+    s.id = 'ml-logo-bundle';
+    s.src = base + 'ml-logo.bundle.js';
+    s.defer = true;
+    d.body.appendChild(s);
+  }
+
+  function scheduleLoad() {
+    if (w.requestIdleCallback) {
+      w.requestIdleCallback(loadBundle, { timeout: 2500 });
+    } else {
+      w.addEventListener('load', function () { setTimeout(loadBundle, 120); });
+    }
+  }
+
+  if ('IntersectionObserver' in w) {
+    var io = new w.IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) {
+        io.disconnect();
+        scheduleLoad();
+      }
+    }, { rootMargin: '120px', threshold: 0.01 });
+    io.observe(el);
+  } else {
+    scheduleLoad();
+  }
+})(window, document, 'SOSTITUISCI_URL_CARTELLA/');
+</script>
+`;
+
+writeFileSync(join(root, 'embed', 'elementor.html'), elementorHtml);
+
+const bundleJs = readFileSync(join(root, 'dist', 'ml-logo.bundle.js'), 'utf8');
+const inlineHtml = `<style>
+.ml-logo-anim{display:block;width:100%;max-width:450px;margin:0 auto;line-height:0}
+.ml-logo-anim svg{display:block;width:100%;height:auto}
+.ml-logo-anim path{fill:#1a1a1a!important}
+</style>
+<div class="ml-logo-anim" id="ml-logo-anim" aria-hidden="true"></div>
+<script>
+${bundleJs}
+</script>
+`;
+writeFileSync(join(root, 'embed', 'elementor-incolla.html'), inlineHtml);
+
+console.log('Built dist/logo-animato.js, dist/flubber.min.js, dist/ml-logo.bundle.js');
+console.log('Snippet (incolla in Elementor): embed/elementor-incolla.html');
