@@ -78,6 +78,7 @@
     pathEl.style.fill = LOGO_COLOR;
     pathEl.setAttribute('d', PATHS_ORIGINAL.logomarialuisa);
     svg.appendChild(pathEl);
+    container.innerHTML = '';
     container.appendChild(svg);
 
     var startTime = null;

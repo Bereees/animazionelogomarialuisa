@@ -102,6 +102,16 @@ function prepareScaledPaths() {
 const { viewBox, paths } = prepareScaledPaths();
 const refRing = sampleRing(paths.logomarialuisa, NUM_POINTS);
 
+function ringToFlat(ring) {
+  const flat = new Array(ring.length * 2);
+  for (let i = 0; i < ring.length; i++) {
+    flat[i * 2] = ring[i][0];
+    flat[i * 2 + 1] = ring[i][1];
+  }
+  return flat;
+}
+
+const rings = {};
 const normalized = {};
 for (const [key, d] of Object.entries(paths)) {
   let ring = sampleRing(d, NUM_POINTS);
@@ -109,8 +119,11 @@ for (const [key, d] of Object.entries(paths)) {
   if (key !== 'logomarialuisa') {
     ring = rotateRingToMatch(ring, refRing);
   }
+  rings[key] = ringToFlat(ring);
   normalized[key] = ringToPath(ring);
 }
+
+const originalRing = ringToFlat(refRing);
 
 writeFileSync(
   join(root, 'paths-morph.json'),
@@ -118,6 +131,8 @@ writeFileSync(
     viewBox,
     original: paths,
     morph: normalized,
+    rings,
+    originalRing,
     numPoints: NUM_POINTS,
   }, null, 2)
 );
