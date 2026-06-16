@@ -12,16 +12,18 @@ const js = `/**
   'use strict';
 
   var VIEW_BOX = '${viewBox}';
+  var LOGO_COLOR = '#1a1a1a';
   var PATHS_ORIGINAL = ${JSON.stringify(original)};
   var PATHS_MORPH = ${JSON.stringify(morph)};
+  var MORPH_OPTS = { maxSegmentLength: 5, string: true };
 
   var TIMELINE = [
     { kind: 'hold', key: 'logomarialuisa', duration: 1500 },
-    { kind: 'morph', from: 'logomarialuisa', to: 'tondo', duration: 1000 },
+    { kind: 'morph', from: 'logomarialuisa', to: 'tondo', duration: 1200 },
     { kind: 'hold', key: 'tondo', duration: 500 },
-    { kind: 'morph', from: 'tondo', to: 'squadrato', duration: 1000 },
+    { kind: 'morph', from: 'tondo', to: 'squadrato', duration: 1200 },
     { kind: 'hold', key: 'squadrato', duration: 500 },
-    { kind: 'morph', from: 'squadrato', to: 'logomarialuisa', duration: 1200, settle: true },
+    { kind: 'morph', from: 'squadrato', to: 'logomarialuisa', duration: 1400, settle: true },
     { kind: 'hold', key: 'logomarialuisa', duration: 500 }
   ];
 
@@ -29,11 +31,7 @@ const js = `/**
     return sum + step.duration;
   }, 0);
 
-  var SETTLE_SPLIT = 0.68;
-
-  function easeInOut(t) {
-    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-  }
+  var SETTLE_SPLIT = 0.7;
 
   function easeInOutQuart(t) {
     return t < 0.5 ? 8 * Math.pow(t, 4) : 1 - Math.pow(-2 * t + 2, 4) / 2;
@@ -53,10 +51,7 @@ const js = `/**
     return TIMELINE
       .filter(function (step) { return step.kind === 'morph'; })
       .map(function (step) {
-        return flub.interpolate(PATHS_MORPH[step.from], PATHS_MORPH[step.to], {
-          maxSegmentLength: 8,
-          string: true
-        });
+        return flub.interpolate(PATHS_MORPH[step.from], PATHS_MORPH[step.to], MORPH_OPTS);
       });
   }
 
@@ -74,7 +69,7 @@ const js = `/**
     var settleToOriginal = flub.interpolate(
       PATHS_MORPH.logomarialuisa,
       PATHS_ORIGINAL.logomarialuisa,
-      { maxSegmentLength: 8, string: true }
+      MORPH_OPTS
     );
 
     var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -86,7 +81,8 @@ const js = `/**
     svg.style.height = 'auto';
 
     var pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    pathEl.setAttribute('fill', '#1a1a1a');
+    pathEl.setAttribute('fill', LOGO_COLOR);
+    pathEl.style.fill = LOGO_COLOR;
     pathEl.setAttribute('d', PATHS_ORIGINAL.logomarialuisa);
     svg.appendChild(pathEl);
     container.appendChild(svg);
@@ -114,7 +110,7 @@ const js = `/**
               pathEl.setAttribute('d', settleToOriginal(settleProgress));
             }
           } else {
-            var eased = easeInOut(t / step.duration);
+            var eased = easeInOutQuart(t / step.duration);
             pathEl.setAttribute('d', morphFns[morphIdx](eased));
           }
           requestAnimationFrame(frame);
