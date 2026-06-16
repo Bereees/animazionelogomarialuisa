@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logo Maria Luisa — Anteprima animazione</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #ffffff;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #333;
+    }
+    .preview-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #eee;
+      background: #fafafa;
+    }
+    .preview-header h1 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .preview-header p {
+      margin: 0.25rem 0 0;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    .preview-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+    .ml-logo-anim {
+      width: 100%;
+      max-width: 450px;
+    }
+  </style>
+</head>
+<body>
+  <header class="preview-header">
+    <h1>Anteprima — Logo animato Maria Luisa</h1>
+    <p>Loop ~6,7s · morphing fluido, ingresso morbido su logomarialuisa</p>
+  </header>
+  <main class="preview-stage">
+    <div class="ml-logo-anim" id="ml-logo-anim"></div>
+  </main>
+
+  <script src="dist/flubber.min.js"></script>
+  <script src="dist/logo-animato.js"></script>
+</body>
+</html>
